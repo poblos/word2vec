@@ -1,9 +1,11 @@
 import numpy as np
+from datasets import load_dataset
+from collections import Counter
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
-def nearest_neighbors(word, W_in, word2idx, idx2word, top_n=15):
+def nearest_neighbors(word, W_in, word2idx, idx2word, top_n=5):
     if word not in word2idx:
         print(f"'{word}' not in vocabulary")
         return
@@ -44,10 +46,6 @@ def analogy(word_a, word_b, word_c, W_in, word2idx, idx2word, top_n=3):
 if __name__ == "__main__":
     W_in = np.load("W_in.npy")
     W_out = np.load("W_out.npy")
-    print("siema")
-
-    from datasets import load_dataset
-    from collections import Counter
 
     ds = load_dataset("afmck/text8", split="train")
     corpus = "".join(ds["text"]).split()

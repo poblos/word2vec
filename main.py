@@ -98,7 +98,7 @@ if __name__ == "__main__":
     parser.add_argument("--unigram_power", type=float, default=0.75)
     parser.add_argument("--negatives", type=int, default=10)
     parser.add_argument("--embed_size", type=int, default=100)
-    parser.add_argument("--lr", type=float, default=0.025)
+    parser.add_argument("--lr", type=float, default=0.1)
     parser.add_argument("--epochs", type=int, default=1)
     args = parser.parse_args()
 
@@ -106,6 +106,8 @@ if __name__ == "__main__":
     print(f"Loaded text8 corpus with {len(corpus)} characters.")
     corpus = corpus.split(sep=' ')
     counter = Counter(corpus)
+
+    print(f"\nTop 5 most common words and their number of occurences:")
     print(counter.most_common(5))
 
     vocabulary = [word for word, count in counter.items() if count > args.frequency_cutoff]
@@ -114,23 +116,10 @@ if __name__ == "__main__":
 
     encoded = [w2i[token] for token in corpus if token in w2i]
 
-    print(f"Vocabulary size: {len(w2i)}")
-    print(f"Encoded corpus length: {len(encoded)}")
-
-    generator = generate_training_pairs(encoded, args.max_window)
-    for i in range(5):
-        print(next(generator))
+    print(f"\nVocabulary size: {len(w2i)}")
+    print(f"Encoded corpus length: {len(encoded)}\n")
 
     noise = build_noise_distribution(counter, w2i, args.unigram_power)
-    print(sample_negatives(noise,args.negatives))
-
-    # get indices of the 5 largest probabilities in descending order
-    top_k = 5
-    top_indices = np.argpartition(noise, -top_k)[-top_k:]
-    top_indices = top_indices[np.argsort(noise[top_indices])[::-1]]
-
-    for idx in top_indices:
-        print(i2w[idx], noise[idx])
 
     W_in = np.random.randn(len(w2i), args.embed_size) * 0.01
     W_out = np.random.randn(len(w2i), args.embed_size) * 0.01
